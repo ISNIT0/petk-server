@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(logger('tiny'));
-  app.enableCors();
+  app.enableCors({ origin: 'https://alphaiota.io' });
   app.useGlobalPipes(new ValidationPipe());
   await app.listen(PORT);
 }
