@@ -12,11 +12,11 @@ export class ProfileService {
     private profileRepository: Repository<Profile>,
   ) {}
   async updateProfile(
-    actorEmail: string,
+    authContext: IAuthenticatedContext,
     body: { name: string; avatarUrl: string },
   ) {
     const actor = await this.profileRepository.findOneByOrFail({
-      email: actorEmail,
+      email: authContext.profile.email,
     });
 
     Object.assign(actor, body);

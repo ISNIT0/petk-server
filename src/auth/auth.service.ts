@@ -4,9 +4,10 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { VerificationService } from './verification/verification.service';
 import { Profile } from 'src/database/entity/Profile.entity';
+import { Org } from 'src/database/entity/Org.entity';
 
 export interface IAuthenticatedContext {
-  profile: { id: string; email: string; name: string };
+  profile: { id: string; email: string; name: string; avatarUrl: string };
   org: { id: string; name: string };
 }
 
@@ -15,6 +16,8 @@ export class AuthService {
   constructor(
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
+    @InjectRepository(Org)
+    private orgRepository: Repository<Org>,
     private verificationService: VerificationService,
     private jwtService: JwtService,
   ) {}
@@ -45,7 +48,21 @@ export class AuthService {
     return this.profileRepository.findOneOrFail({ where: { email } });
   }
 
-  async login(_profile: Profile, orgId: string) {
+  async generateJwt(authContext: IAuthenticatedContext) {
+    const { profile, org } = await this.getAuthenticatedContext(
+      { id: authContext.profile.id } as Profile,
+      authContext.org.id,
+    );
+    const payload = {
+      profile,
+      org,
+    };
+    return {
+      access_token: this.jwtService.sign(payload),
+    };
+  }
+
+  async login(_profile: Profile, orgId: string | 'unknown') {
     const { profile, org } = await this.getAuthenticatedContext(
       _profile,
       orgId,
@@ -69,13 +86,31 @@ export class AuthService {
       relations: { orgs: true },
     });
 
-    const org = profile.orgs.find((org) => org.id === orgId);
+    let org;
 
-    if (!org)
-      throw new Error(`Unable to authenticate profile for org [${orgId}]`);
+    if (!profile.orgs.length) {
+      let _org = new Org();
+      _org.name = 'Default';
+      _org.orgUsers = [profile];
+      _org = await this.orgRepository.save(_org);
+      org = _org;
+    } else {
+      org =
+        orgId === 'unknown'
+          ? profile.orgs[0]
+          : profile.orgs.find((org) => org.id === orgId);
+
+      if (!org)
+        throw new Error(`Unable to authenticate profile for org [${orgId}]`);
+    }
 
     return {
-      profile: { id: profile.id, email: profile.email, name: profile.name },
+      profile: {
+        id: profile.id,
+        email: profile.email,
+        name: profile.name,
+        avatarUrl: profile.avatarUrl,
+      },
       org: { id: org.id, name: org.name },
     };
   }

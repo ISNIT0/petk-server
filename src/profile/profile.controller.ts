@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { ProfileService } from './profile.service';
+import { IAuthenticatedContext } from 'src/auth/auth.service';
 
 @Controller('profile')
 export class ProfileController {
@@ -8,7 +9,7 @@ export class ProfileController {
   @Post('/update')
   @UseGuards(JwtAuthGuard)
   updateProfile(@Req() req, @Body() body: { name: string; avatarUrl: string }) {
-    const email = req.user.email;
-    return this.profileService.updateProfile(email, body);
+    const authContext: IAuthenticatedContext = req.authContext;
+    return this.profileService.updateProfile(authContext, body);
   }
 }

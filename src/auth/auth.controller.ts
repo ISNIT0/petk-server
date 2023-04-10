@@ -7,7 +7,7 @@ import {
   Param,
 } from '@nestjs/common';
 import { IsEmail, IsString } from 'class-validator';
-import { AuthService } from './auth.service';
+import { AuthService, IAuthenticatedContext } from './auth.service';
 import { Profile } from 'src/database/entity/Profile.entity';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
@@ -37,14 +37,15 @@ export class AuthController {
 
   @UseGuards(JwtAuthGuard)
   @Get('jwt')
-  getJwt(@Request() req): { jwt: string } {
-    throw new Error(`TODO: getJWT Update`);
-    return { jwt: this.jwtService.sign(req.user) };
+  async getJwt(@Request() req): Promise<{ jwt: string }> {
+    return {
+      jwt: (await this.authService.generateJwt(req.authContext)).access_token,
+    };
   }
 
   @UseGuards(EmailAuthGuard)
   @Post('/:orgId/login')
-  async login(@Request() req, @Param('orgId') orgId: string) {
+  async login(@Request() req, @Param('orgId') orgId: string | 'unknown') {
     if (req.user) return this.authService.login(req.user, orgId);
     else {
       return { ok: true };

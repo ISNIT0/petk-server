@@ -12,11 +12,12 @@ import { Profile } from 'src/database/entity/Profile.entity';
 import { DatabaseModule } from 'src/database/database.module';
 import { ApiKeyModule } from 'src/api-key/api-key.module';
 import { OrgModule } from 'src/org/org.module';
+import { Org } from 'src/database/entity/Org.entity';
 
 @Module({
   imports: [
     DatabaseModule,
-    TypeOrmModule.forFeature([Profile]),
+    TypeOrmModule.forFeature([Profile, Org]),
     ConfigModule.forRoot(),
     PassportModule,
     JwtModule.register({
