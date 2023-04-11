@@ -43,7 +43,7 @@ export class ToolService {
     );
 
     if (!toolProvider) {
-      throw new Error(`Tool ${toolName} not found`);
+      return { result: `Tool ${toolName} is not valid` };
     }
 
     console.info(`Executing too ${toolName} with input [${input}]`);

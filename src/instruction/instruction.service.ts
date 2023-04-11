@@ -27,12 +27,20 @@ export class InstructionService {
 
     const action = this.getAction(result);
     if (action) {
-      const { result: toolResult, tool } = await this.toolService.executeTool(
-        authContext,
-        action.action,
-        action.actionInput,
-      );
+      let toolResult;
+      let tool;
 
+      try {
+        const ret = await this.toolService.executeTool(
+          authContext,
+          action.action,
+          action.actionInput,
+        );
+        toolResult = ret.result;
+      } catch (err) {
+        console.error(`Failed to execute tool ${action.action}`, err);
+        toolResult = `Failed to perform requested action`;
+      }
       session.inferences.push(result);
 
       return this.infer(
