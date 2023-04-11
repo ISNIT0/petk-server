@@ -32,17 +32,15 @@ export class ToolService {
     toolName: string,
     input: string,
   ) {
-    let tool;
-    try {
-      tool = await this.toolRepository.findOneOrFail({
-        where: {
-          integration: { modelName: toolName },
-          org: { id: authContext.org.id },
-        },
-      });
-    } catch (err) {
-      return { result: `Tool ${toolName} is not valid` };
-    }
+    const tool = await this.toolRepository.findOne({
+      where: {
+        integration: { modelName: toolName },
+        org: { id: authContext.org.id },
+      },
+    });
+
+    if (!tool) return { result: `Tool ${toolName} is not valid` };
+
     const toolProvider = this.toolProviderService.getTool(
       tool.integration.type,
     );
@@ -51,7 +49,7 @@ export class ToolService {
       return { result: `Tool ${toolName} is not valid` };
     }
 
-    console.info(`Executing too ${toolName} with input [${input}]`);
+    console.info(`Executing tool ${toolName} with input [${input}]`);
     const result = await toolProvider.exec(authContext, tool.config, input);
     return { result, tool };
   }
