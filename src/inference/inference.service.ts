@@ -26,6 +26,10 @@ export class InferenceService {
     private profileService: ProfileService,
   ) {}
 
+  async save(inference: Inference) {
+    return this.inferenceRepository.save(inference);
+  }
+
   async getInferenceParameters(
     authContext: IAuthenticatedContext,
     inferenceRequest: IInferenceRequest,
