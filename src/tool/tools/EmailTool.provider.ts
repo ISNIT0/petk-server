@@ -19,7 +19,7 @@ export class EmailToolProvider implements IToolProvider<EmailToolConfig> {
       from: config.from,
       to: authContext.profile.email,
       subject: 'A message from the AI...',
-      body: input.slice(1, -1).split(',').slice(1).join(',').trim(),
+      body: input,
     });
 
     await new Promise((resolve) => {
