@@ -5,8 +5,10 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { Org } from './Org.entity';
+import { ToolIntegration } from './ToolIntegration.entity';
 
 @Entity()
 export class Tool {
@@ -21,14 +23,9 @@ export class Tool {
   @ManyToOne(() => Org)
   org: Org;
 
-  @Column()
-  name: string;
+  @ManyToOne(() => ToolIntegration, { eager: true })
+  @JoinColumn()
+  integration: ToolIntegration;
 
-  @Column()
-  description: string;
-
-  @Column() modelName: string;
-  @Column() modelDescription: string;
-  // TODO: some kind of auth
-  @Column() webhookUrl: string;
+  @Column('simple-json') config: Record<string, any>;
 }

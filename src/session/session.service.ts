@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { Session } from 'src/database/entity/Session.entity';
+import { ToolIntegration } from 'src/database/entity/ToolIntegration.entity';
 import { OrgService } from 'src/org/org.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { Repository } from 'typeorm';
@@ -11,6 +12,12 @@ export interface IInferenceRequest {
   model: string;
   promptTemplate: string;
   type: 'automated' | 'user';
+  tools: string[];
+  toolProfile?: {
+    name: string;
+    avatarUrl: string;
+    provider: ToolIntegration['type'];
+  };
 }
 
 export type ITestInferenceRequest = IInferenceRequest & {

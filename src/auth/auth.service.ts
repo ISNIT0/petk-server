@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { VerificationService } from './verification/verification.service';
 import { Profile } from 'src/database/entity/Profile.entity';
 import { Org } from 'src/database/entity/Org.entity';
+import { OrgService } from 'src/org/org.service';
 
 export interface IAuthenticatedContext {
   profile: { id: string; email: string; name: string; avatarUrl: string };
@@ -16,8 +17,7 @@ export class AuthService {
   constructor(
     @InjectRepository(Profile)
     private profileRepository: Repository<Profile>,
-    @InjectRepository(Org)
-    private orgRepository: Repository<Org>,
+    private orgService: OrgService,
     private verificationService: VerificationService,
     private jwtService: JwtService,
   ) {}
@@ -89,11 +89,8 @@ export class AuthService {
     let org;
 
     if (!profile.orgs.length) {
-      let _org = new Org();
-      _org.name = 'Default';
-      _org.orgUsers = [profile];
-      _org = await this.orgRepository.save(_org);
-      org = _org;
+      org = await this.orgService.createOrgForUser(profile);
+      profile.orgs = [org];
     } else {
       org =
         orgId === 'unknown'

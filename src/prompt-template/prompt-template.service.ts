@@ -5,9 +5,14 @@ import { Org } from 'src/database/entity/Org.entity';
 import { PromptTemplate } from 'src/database/entity/PromptTemplate.entity';
 import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstance.entity';
 import { Session } from 'src/database/entity/Session.entity';
+import { Tool } from 'src/database/entity/Tool.entity';
 import { InferenceService } from 'src/inference/inference.service';
-import { ITestInferenceRequest } from 'src/session/session.service';
-import { Repository } from 'typeorm';
+import {
+  IInferenceRequest,
+  ITestInferenceRequest,
+} from 'src/session/session.service';
+import { In, Repository } from 'typeorm';
+import Handlebars from 'handlebars';
 
 @Injectable()
 export class PromptTemplateService {
@@ -18,6 +23,8 @@ export class PromptTemplateService {
     private promptTemplateInstanceRepository: Repository<PromptTemplateInstance>,
     @InjectRepository(Org)
     private orgRepository: Repository<Org>,
+    @InjectRepository(Tool)
+    private toolRepository: Repository<Tool>,
     @Inject(forwardRef(() => InferenceService))
     private inferenceService: InferenceService,
   ) {}
@@ -170,29 +177,27 @@ export class PromptTemplateService {
   }
 
   async compilePromptTemplateInstance(
+    authContext: IAuthenticatedContext,
     instance: PromptTemplateInstance,
     session: Session,
-    inputPrompt: string,
+    inferenceRequest: IInferenceRequest,
   ) {
-    const { tools } = await this.promptTemplateInstanceRepository.findOneOrFail(
-      {
-        where: { id: instance.id },
-        relations: { tools: true },
+    const tools = await this.toolRepository.find({
+      where: {
+        id: In(inferenceRequest.tools || []),
+        org: { id: authContext.org.id },
       },
-    );
+    });
 
-    const compiledTools = tools
-      .map((tool) => `${tool.name}: ${tool.description}`)
-      .join('\n');
-    const compiledToolNames = tools.map((tool) => tool.name).join(', ');
+    const hbsTemplate = Handlebars.compile(instance.prompt);
+    const compiledPrompt = hbsTemplate({
+      tools,
+      inferences: session.inferences,
+      input: inferenceRequest.prompt,
+    });
 
-    const compiledHistory = await this.compileSessionHistory(session);
-
-    const compiledPrompt = instance.prompt
-      .replace('{tools}', compiledTools)
-      .replace('{tool_names}', compiledToolNames)
-      .replace('{history}', compiledHistory)
-      .replace('{input}', inputPrompt);
+    console.log('compiled', compiledPrompt);
+    console.log('ir', inferenceRequest);
 
     return compiledPrompt;
   }

@@ -7,6 +7,7 @@ import { SessionService } from './session.service';
 import { SessionController } from './session.controller';
 import { ApiKeyModule } from 'src/api-key/api-key.module';
 import { InferenceModule } from 'src/inference/inference.module';
+import { InstructionModule } from 'src/instruction/instruction.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { InferenceModule } from 'src/inference/inference.module';
     ProfileModule,
     ApiKeyModule,
     InferenceModule,
+    InstructionModule,
   ],
   providers: [SessionService],
   exports: [SessionService],

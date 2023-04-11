@@ -11,6 +11,7 @@ import { Model } from './Model.entity';
 import { Profile } from './Profile.entity';
 import { PromptTemplateInstance } from './PromptTemplateInstance.entity';
 import { Session } from './Session.entity';
+import { ToolIntegration } from './ToolIntegration.entity';
 
 @Entity()
 export class Inference {
@@ -35,4 +36,10 @@ export class Inference {
 
   @ManyToOne(() => Session) @JoinColumn() session: Session;
   @ManyToOne(() => Profile) @JoinColumn() profile?: Profile;
+
+  @Column('simple-json', { nullable: true }) toolProfile?: {
+    name: string;
+    avatarUrl: string;
+    provider: ToolIntegration['type'];
+  };
 }

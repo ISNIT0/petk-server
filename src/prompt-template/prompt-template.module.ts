@@ -7,10 +7,16 @@ import { PromptTemplateService } from './prompt-template.service';
 import { PromptTemplateController } from './prompt-template.controller';
 import { ApiKeyModule } from 'src/api-key/api-key.module';
 import { Org } from 'src/database/entity/Org.entity';
+import { Tool } from 'src/database/entity/Tool.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([PromptTemplate, PromptTemplateInstance, Org]),
+    TypeOrmModule.forFeature([
+      PromptTemplate,
+      PromptTemplateInstance,
+      Org,
+      Tool,
+    ]),
     forwardRef(() => InferenceModule),
     forwardRef(() => ApiKeyModule),
   ],

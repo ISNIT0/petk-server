@@ -29,6 +29,7 @@ export class ModelProviderService {
       throw new Error(`Couldn't find provider [${model.provider}]`);
 
     const prompt = await provider.preparePrompt(
+      authContext,
       model.config,
       inferenceRequest,
       promptTemplateInstance,
@@ -56,6 +57,7 @@ export class ModelProviderService {
       throw new Error(`Couldn't find provider [${model.provider}]`);
 
     return provider.preparePrompt(
+      authContext,
       model.config,
       inferenceRequest,
       promptTemplateInstance,

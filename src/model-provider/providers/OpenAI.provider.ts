@@ -10,6 +10,7 @@ import { IInferenceRequest } from 'src/session/session.service';
 import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstance.entity';
 import { Session } from 'src/database/entity/Session.entity';
 import { PromptTemplateService } from 'src/prompt-template/prompt-template.service';
+import { IAuthenticatedContext } from 'src/auth/auth.service';
 
 interface IOpenAPIProviderConfig {
   modelId: string;
@@ -29,6 +30,7 @@ export class OpenAIProvider extends IModelProvider<
   }
 
   override async preparePrompt(
+    authContext: IAuthenticatedContext,
     config: IOpenAPIProviderConfig,
     inferenceRequest: IInferenceRequest,
     promptTemplate: PromptTemplateInstance,
@@ -36,9 +38,10 @@ export class OpenAIProvider extends IModelProvider<
   ): Promise<string | ChatCompletionRequestMessage[]> {
     if (config.modelId.startsWith('text-davinci-0')) {
       return this.promptTemplateService.compilePromptTemplateInstance(
+        authContext,
         promptTemplate,
         session,
-        inferenceRequest.prompt,
+        inferenceRequest,
       );
     } else {
       // TODO: TOOLS
@@ -80,6 +83,7 @@ export class OpenAIProvider extends IModelProvider<
     prompt: string | ChatCompletionRequestMessage[],
     inferenceSettings: IBaseInferenceSettings,
   ) {
+    console.log(prompt);
     const configuration = new Configuration({
       apiKey: config.apiKey,
     });

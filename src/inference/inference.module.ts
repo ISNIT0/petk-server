@@ -7,6 +7,7 @@ import { ModelModule } from 'src/model/model.module';
 import { ProfileModule } from 'src/profile/profile.module';
 import { PromptTemplateModule } from 'src/prompt-template/prompt-template.module';
 import { InferenceService } from './inference.service';
+import { ToolModule } from 'src/tool/tool.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { InferenceService } from './inference.service';
     ModelProviderModule,
     ProfileModule,
     TypeOrmModule.forFeature([Session, Inference]),
+    ToolModule,
   ],
   providers: [InferenceService],
   exports: [InferenceService],

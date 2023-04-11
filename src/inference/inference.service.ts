@@ -108,6 +108,7 @@ export class InferenceService {
     inference.response = ret.response;
     inference.session = session;
     inference.type = inferenceRequest.type;
+    inference.toolProfile = inferenceRequest.toolProfile;
 
     inference = await this.inferenceRepository.save(inference);
 

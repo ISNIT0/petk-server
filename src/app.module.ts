@@ -16,6 +16,7 @@ import { OrgModule } from './org/org.module';
 import { PromptTemplateModule } from './prompt-template/prompt-template.module';
 import { ModelProviderModule } from './model-provider/model-provider.module';
 import { IntegrationModule } from './integration/integration.module';
+import { ToolModule } from './tool/tool.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { IntegrationModule } from './integration/integration.module';
     PromptTemplateModule,
     ModelProviderModule,
     IntegrationModule,
+    ToolModule,
   ],
   controllers: [],
   providers: [],

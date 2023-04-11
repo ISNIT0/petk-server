@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstance.entity';
 import { Session } from 'src/database/entity/Session.entity';
 import { IInferenceRequest } from 'src/session/session.service';
@@ -16,6 +17,7 @@ export interface IBaseInferenceSettings {
 @Injectable()
 export class IModelProvider<TModelConfig, TPromptFormat> {
   async preparePrompt(
+    authContext: IAuthenticatedContext,
     config: TModelConfig,
     inferenceRequest: IInferenceRequest,
     promptTemplate: PromptTemplateInstance,
