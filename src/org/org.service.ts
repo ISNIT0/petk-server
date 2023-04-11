@@ -93,7 +93,7 @@ export class OrgService {
     let instructionPromptTemplateInstance = new PromptTemplateInstance();
     instructionPromptTemplateInstance.org = org;
     instructionPromptTemplateInstance.maxTokens = 1000;
-    instructionPromptTemplateInstance.stopSequence = null;
+    instructionPromptTemplateInstance.stopSequence = 'Observation:';
     instructionPromptTemplateInstance.temperature = 0;
     instructionPromptTemplateInstance.description = 'Standard Tool-Using Bot';
     instructionPromptTemplateInstance.prompt = instructionPrompt;
