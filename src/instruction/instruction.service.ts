@@ -50,9 +50,9 @@ export class InstructionService {
           prompt: `Observation: ${toolResult}`,
           type: 'automated',
           toolProfile: {
-            name: tool.integration.name,
-            avatarUrl: tool.integration.iconUrl,
-            provider: tool.integration.type,
+            name: tool?.integration.name,
+            avatarUrl: tool?.integration.iconUrl,
+            provider: tool?.integration.type,
           },
         },
         session,
