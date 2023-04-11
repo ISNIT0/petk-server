@@ -32,12 +32,17 @@ export class ToolService {
     toolName: string,
     input: string,
   ) {
-    const tool = await this.toolRepository.findOneOrFail({
-      where: {
-        integration: { modelName: toolName },
-        org: { id: authContext.org.id },
-      },
-    });
+    let tool;
+    try {
+      tool = await this.toolRepository.findOneOrFail({
+        where: {
+          integration: { modelName: toolName },
+          org: { id: authContext.org.id },
+        },
+      });
+    } catch (err) {
+      return { result: `Tool ${toolName} is not valid` };
+    }
     const toolProvider = this.toolProviderService.getTool(
       tool.integration.type,
     );
