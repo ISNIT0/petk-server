@@ -24,7 +24,7 @@ import { ToolModule } from './tool/tool.module';
     TypeOrmModule.forRoot(dataSourceConfig),
     AuthModule,
     ProfileModule,
-    RedisModule,
+    // RedisModule,
     ChatModule,
     ModelModule,
     InstructionModule,
