@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { IToolProvider } from './tool-provider.service';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { Email } = require('email');
+import * as sgMail from '@sendgrid/mail';
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 interface EmailToolConfig {
   from: string;
@@ -15,18 +15,13 @@ export class EmailToolProvider implements IToolProvider<EmailToolConfig> {
     config: EmailToolConfig,
     input: string,
   ) {
-    const msg = new Email({
-      from: config.from,
+    await sgMail.send({
       to: authContext.profile.email,
-      subject: 'A message from the AI...',
-      body: input,
-    });
-
-    await new Promise((resolve) => {
-      msg.send((err: any) => {
-        if (err) console.error('Failed to send', err);
-        resolve(0);
-      });
+      from: 'ai@alphaiota.io',
+      templateId: 'd-67ac7eced4b74061bdcb74a357e3a701',
+      dynamicTemplateData: {
+        message: input.slice(1, -1),
+      },
     });
 
     return 'Email sent';
