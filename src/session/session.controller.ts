@@ -9,6 +9,7 @@ import {
   Request,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { Session } from 'src/database/entity/Session.entity';
 import { InferenceService } from 'src/inference/inference.service';
@@ -16,6 +17,8 @@ import { InstructionService } from 'src/instruction/instruction.service';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { IInferenceRequest, SessionService } from 'src/session/session.service';
 
+@ApiTags('session')
+@ApiBearerAuth()
 @Controller('/session/:sessionType')
 @UseGuards(JwtAuthGuard)
 export class SessionController {
@@ -28,21 +31,25 @@ export class SessionController {
   ) {}
 
   @Get('/all')
+  @ApiParam({ name: 'sessionType', enum: ['chat', 'instruction'] })
   async getAll(
     @Request() req,
-    @Param('sessionType') sessionType: 'chat' | 'instruction',
+    @Param('sessionType')
+    sessionType: 'chat' | 'instruction',
   ) {
     const authContext: IAuthenticatedContext = req.authContext;
     return this.sessionService.getSessions(authContext, sessionType);
   }
 
   @Get('/:id')
+  @ApiParam({ name: 'sessionType', enum: ['chat', 'instruction'] })
   async getById(@Request() req, @Param('id') sessionId: string) {
     const authContext: IAuthenticatedContext = req.authContext;
     return this.sessionService.getSessionById(authContext, sessionId, true);
   }
 
   @Post('/:id/transcript')
+  @ApiParam({ name: 'sessionType', enum: ['chat', 'instruction'] })
   async getTranscriptById(
     @Request() req,
     @Param('id') sessionId: string,
@@ -65,6 +72,7 @@ export class SessionController {
   }
 
   @Post('/:id')
+  @ApiParam({ name: 'sessionType', enum: ['chat', 'instruction'] })
   async infer(
     @Request() req,
     @Param('sessionType') sessionType: 'chat' | 'instruction',
@@ -73,8 +81,6 @@ export class SessionController {
   ) {
     const authContext: IAuthenticatedContext = req.authContext;
     let session: Session;
-
-    console.log({ sessionId, sessionType, inferenceRequest });
 
     if (sessionId === 'new') {
       session = await this.sessionService.createSession(
@@ -101,15 +107,17 @@ export class SessionController {
         inferences,
       };
     } else {
-      const inference = await this.inferenceService.infer(
-        authContext,
-        { ...inferenceRequest, type: 'user' },
-        session,
-      );
+      const { inference, promptSentinelResults } =
+        await this.inferenceService.infer(
+          authContext,
+          { ...inferenceRequest, type: 'user' },
+          session,
+        );
 
       return {
         sessionId: session.id,
         inferences: [inference],
+        promptSentinelResults,
       };
     }
   }

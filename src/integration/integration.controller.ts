@@ -10,7 +10,10 @@ import {
 import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { IntegrationService } from './integration.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('model-integration')
+@ApiBearerAuth()
 @Controller('integration')
 @UseGuards(JwtAuthGuard)
 export class IntegrationController {

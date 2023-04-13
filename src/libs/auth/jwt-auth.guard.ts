@@ -7,7 +7,10 @@ export class JwtAuthGuard implements CanActivate {
   constructor(private apiKeyService: ApiKeyService) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
-    const apiKey = request.headers?.['x-api-key'];
+    const authHeader = request.headers?.authorization || '';
+    const apiKey = authHeader.startsWith('Bearer api-')
+      ? authHeader.replace('Bearer api-', '')
+      : null;
 
     if (apiKey) {
       try {
@@ -22,7 +25,6 @@ export class JwtAuthGuard implements CanActivate {
       }
     }
 
-    const authHeader = request.headers?.authorization || '';
     const token = authHeader.replace('Bearer ', '');
     if (!token) return false;
     try {

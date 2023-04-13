@@ -2,7 +2,9 @@ import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { ProfileService } from './profile.service';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
+import { ApiExcludeController } from '@nestjs/swagger';
 
+@ApiExcludeController()
 @Controller('profile')
 export class ProfileController {
   constructor(private profileService: ProfileService) {}

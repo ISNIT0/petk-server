@@ -7,6 +7,11 @@ import {
   ManyToOne,
 } from 'typeorm';
 import { Inference } from './Inference.entity';
+import { Org } from './Org.entity';
+import { Model } from './Model.entity';
+
+export type InferenceWarningAction = 'block' | 'replace' | 'warn' | 'allow';
+export type InferenceWarningType = 'hallucination' | 'unsafe' | 'pii';
 
 @Entity()
 export class InferenceWarning {
@@ -18,7 +23,12 @@ export class InferenceWarning {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @ManyToOne(() => Org) org: Org;
+  @ManyToOne(() => Model) model: Model;
   @ManyToOne(() => Inference) inference: Inference;
-  @Column() type: 'hallucination' | 'unsafe'; // TODO: what kinds of issues do inferences have?
-  @Column() detail: string; // TODO: What kind of detailed warning information can we capture?
+  @Column() warningOn: 'prompt' | 'response';
+  @Column() type: InferenceWarningType;
+  @Column() actionTaken: InferenceWarningAction;
+  @Column() detail: string;
+  @Column({ nullable: true }) badString?: string;
 }

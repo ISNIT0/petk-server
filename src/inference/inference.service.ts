@@ -2,14 +2,17 @@ import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { Inference } from 'src/database/entity/Inference.entity';
+import { Profile } from 'src/database/entity/Profile.entity';
 import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstance.entity';
 import { Session } from 'src/database/entity/Session.entity';
+import { Tool } from 'src/database/entity/Tool.entity';
 import { ModelProviderService } from 'src/model-provider/model-provider.service';
 import { ModelService } from 'src/model/model.service';
 import { ProfileService } from 'src/profile/profile.service';
 import { PromptTemplateService } from 'src/prompt-template/prompt-template.service';
 import { IInferenceRequest } from 'src/session/session.service';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { RawInferenceDTO } from './inference.controller';
 
 @Injectable()
 export class InferenceService {
@@ -22,6 +25,8 @@ export class InferenceService {
     private sessionRepository: Repository<Session>,
     @InjectRepository(Inference)
     private inferenceRepository: Repository<Inference>,
+    @InjectRepository(Tool)
+    private toolRepository: Repository<Tool>,
     private modelProvider: ModelProviderService,
     private profileService: ProfileService,
   ) {}
@@ -57,26 +62,27 @@ export class InferenceService {
       authContext,
       inferenceRequest.model,
     );
-
-    const ret = await this.modelProvider.infer(
-      authContext,
-      model,
-      inferenceRequest,
-      templateInstance,
-      session,
-    );
+    const tools = await this.toolRepository.find({
+      where: {
+        id: In(inferenceRequest.tools || []),
+        org: { id: authContext.org.id },
+      },
+    });
 
     const inference = new Inference();
 
     inference.model = model;
+    inference.tools = tools;
     // inference.previousInference; // TODO
     inference.profile = profile;
     inference.prompt = inferenceRequest.prompt;
     inference.promptTemplateInstance = templateInstance;
-    inference.response = ret.response;
-    inference.session = new Session();
+    inference.session = session;
     inference.type = inferenceRequest.type;
 
+    const ret = await this.modelProvider.infer(authContext, inference, session);
+
+    inference.response = ret.response;
     return inference;
   }
 
@@ -88,39 +94,87 @@ export class InferenceService {
     const [profile] = await Promise.all([
       this.profileService.getByAuthContext(authContext),
     ]);
-
     const { model, promptTemplate } = await this.getInferenceParameters(
       authContext,
       inferenceRequest,
     );
-
-    const ret = await this.modelProvider.infer(
-      authContext,
-      model,
-      inferenceRequest,
-      promptTemplate,
-      session,
-    );
+    const tools = await this.toolRepository.find({
+      where: {
+        id: In(inferenceRequest.tools || []),
+        org: { id: authContext.org.id },
+      },
+    });
 
     let inference = new Inference();
 
     inference.model = model;
+    inference.tools = tools;
     // inference.previousInference; // TODO
     inference.profile = profile;
     inference.prompt = inferenceRequest.prompt;
     inference.promptTemplateInstance = promptTemplate;
-    inference.response = ret.response;
     inference.session = session;
     inference.type = inferenceRequest.type;
     inference.toolProfile = inferenceRequest.toolProfile;
+    inference = await this.inferenceRepository.save(inference);
 
+    const { response, promptSentinelResults, responseSentinelResults } =
+      await this.modelProvider.infer(authContext, inference, session);
+
+    inference.response = response;
     inference = await this.inferenceRepository.save(inference);
 
     await this.sessionRepository.update(session.id, {
       description: inference.response,
     });
 
-    return inference;
+    return { inference, promptSentinelResults, responseSentinelResults };
+  }
+
+  async rawInfer(
+    authContext: IAuthenticatedContext,
+    inferenceRequest: RawInferenceDTO,
+    session: Session,
+  ) {
+    const [profile] = await Promise.all([
+      this.profileService.getByAuthContext(authContext),
+    ]);
+    const model = await this.modelService.getById(
+      authContext,
+      inferenceRequest.modelId,
+    );
+    let template: PromptTemplateInstance;
+    if (inferenceRequest.templateId) {
+      template = await this.promptTemplateService.getById(
+        authContext,
+        inferenceRequest.templateId,
+      );
+    }
+
+    let inference = new Inference();
+
+    inference.model = model;
+    inference.tools = [];
+    inference.promptTemplateInstance = template;
+    inference.promptMergeData = inferenceRequest.templateMergeData;
+    // inference.previousInference; // TODO
+    inference.profile = profile;
+    inference.prompt = inferenceRequest.prompt;
+    inference.session = session;
+    inference.type = 'api';
+    inference = await this.inferenceRepository.save(inference);
+
+    const { response, promptSentinelResults, responseSentinelResults } =
+      await this.modelProvider.infer(authContext, inference, session);
+
+    inference.response = response;
+    inference = await this.inferenceRepository.save(inference);
+
+    await this.sessionRepository.update(session.id, {
+      description: inference.response,
+    });
+
+    return { inference, promptSentinelResults, responseSentinelResults };
   }
 
   async getPrompt(
@@ -132,17 +186,29 @@ export class InferenceService {
       authContext,
       inferenceRequest,
     );
+    const tools = await this.toolRepository.find({
+      where: {
+        id: In(inferenceRequest.tools || []),
+        org: { id: authContext.org.id },
+      },
+    });
+
+    const inference = new Inference();
+
+    inference.model = model;
+    inference.tools = tools;
+    // inference.previousInference; // TODO
+    inference.profile = authContext.profile as Profile;
+    inference.prompt = inferenceRequest.prompt;
+    inference.promptTemplateInstance = promptTemplate;
+    inference.session = session;
+    inference.type = inferenceRequest.type;
+    inference.toolProfile = inferenceRequest.toolProfile;
 
     const inferences = await this.getInferencesForSession(authContext, session);
     session.inferences = inferences;
 
-    return this.modelProvider.getPrompt(
-      authContext,
-      model,
-      inferenceRequest,
-      promptTemplate,
-      session,
-    );
+    return this.modelProvider.getPrompt(authContext, model, inference, session);
   }
 
   async getInferencesForSession(

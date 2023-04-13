@@ -1,11 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
-import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstance.entity';
+import { Inference } from 'src/database/entity/Inference.entity';
 import { Session } from 'src/database/entity/Session.entity';
-import { IInferenceRequest } from 'src/session/session.service';
 
 export interface IModelInferenceResult {
   response: string;
+  toolProfile?: {
+    provider: string;
+    name: string;
+    avatarUrl: string;
+  };
 }
 
 export interface IBaseInferenceSettings {
@@ -19,8 +23,7 @@ export class IModelProvider<TModelConfig, TPromptFormat> {
   async preparePrompt(
     authContext: IAuthenticatedContext,
     config: TModelConfig,
-    inferenceRequest: IInferenceRequest,
-    promptTemplate: PromptTemplateInstance,
+    inference: Inference,
     session: Session,
   ): Promise<TPromptFormat> {
     return;

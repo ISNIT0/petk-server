@@ -11,6 +11,7 @@ import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstan
 import { Session } from 'src/database/entity/Session.entity';
 import { PromptTemplateService } from 'src/prompt-template/prompt-template.service';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
+import { Inference } from 'src/database/entity/Inference.entity';
 
 interface IOpenAPIProviderConfig {
   modelId: string;
@@ -32,31 +33,35 @@ export class OpenAIProvider extends IModelProvider<
   override async preparePrompt(
     authContext: IAuthenticatedContext,
     config: IOpenAPIProviderConfig,
-    inferenceRequest: IInferenceRequest,
-    promptTemplate: PromptTemplateInstance,
+    inference: Inference,
     session: Session,
   ): Promise<string | ChatCompletionRequestMessage[]> {
     if (config.modelId.startsWith('text-davinci-0')) {
       return this.promptTemplateService.compilePromptTemplateInstance(
         authContext,
-        promptTemplate,
+        inference.promptTemplateInstance,
         session,
-        inferenceRequest,
+        inference,
       );
     } else {
       // TODO: TOOLS
       // TODO: smarter prompt parsing so you can pre and post prompt around inputs
       // This assumes history and input go after the rest of the system prompt
-      const systemMsg = promptTemplate.prompt
-        .replace('{tools}', '')
-        .replace('{tool_names}', '')
-        .replace('{history}', '')
-        .replace('{input}', '');
+      const systemMsg =
+        inference.promptTemplateInstance?.prompt
+          .replace('{tools}', '')
+          .replace('{tool_names}', '')
+          .replace('{history}', '')
+          .replace('{input}', '') || '';
       const messages: ChatCompletionRequestMessage[] = [
-        {
-          role: ChatCompletionRequestMessageRoleEnum.System,
-          content: systemMsg,
-        },
+        ...(systemMsg
+          ? [
+              {
+                role: ChatCompletionRequestMessageRoleEnum.System,
+                content: systemMsg,
+              },
+            ]
+          : []),
         ...session.inferences.flatMap((inference) => {
           return [
             {
@@ -71,7 +76,7 @@ export class OpenAIProvider extends IModelProvider<
         }),
         {
           role: ChatCompletionRequestMessageRoleEnum.User,
-          content: inferenceRequest.prompt,
+          content: inference.prompt,
         },
       ];
       return messages;
@@ -83,7 +88,6 @@ export class OpenAIProvider extends IModelProvider<
     prompt: string | ChatCompletionRequestMessage[],
     inferenceSettings: IBaseInferenceSettings,
   ) {
-    console.log(prompt);
     const configuration = new Configuration({
       apiKey: config.apiKey,
     });

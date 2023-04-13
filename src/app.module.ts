@@ -17,6 +17,8 @@ import { PromptTemplateModule } from './prompt-template/prompt-template.module';
 import { ModelProviderModule } from './model-provider/model-provider.module';
 import { IntegrationModule } from './integration/integration.module';
 import { ToolModule } from './tool/tool.module';
+import { InferenceSentinelModule } from './inference-sentinel/inference-sentinel.module';
+import { PiiDetectorModule } from './pii-detector/pii-detector.module';
 
 @Module({
   imports: [
@@ -36,6 +38,8 @@ import { ToolModule } from './tool/tool.module';
     ModelProviderModule,
     IntegrationModule,
     ToolModule,
+    InferenceSentinelModule,
+    PiiDetectorModule,
   ],
   controllers: [],
   providers: [],

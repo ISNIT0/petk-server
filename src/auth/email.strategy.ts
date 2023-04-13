@@ -10,7 +10,6 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(email: string, code: 'code' | string): Promise<any> {
-    console.log({ email, code });
     if (code === 'code') {
       await this.authService.sendEmail(email);
       throw new Error('Code Sent');

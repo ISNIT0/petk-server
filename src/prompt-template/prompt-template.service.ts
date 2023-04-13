@@ -13,6 +13,7 @@ import {
 } from 'src/session/session.service';
 import { In, Repository } from 'typeorm';
 import Handlebars from 'handlebars';
+import { Inference } from 'src/database/entity/Inference.entity';
 
 @Injectable()
 export class PromptTemplateService {
@@ -180,24 +181,14 @@ export class PromptTemplateService {
     authContext: IAuthenticatedContext,
     instance: PromptTemplateInstance,
     session: Session,
-    inferenceRequest: IInferenceRequest,
+    inference: Inference,
   ) {
-    const tools = await this.toolRepository.find({
-      where: {
-        id: In(inferenceRequest.tools || []),
-        org: { id: authContext.org.id },
-      },
-    });
-
     const hbsTemplate = Handlebars.compile(instance.prompt);
     const compiledPrompt = hbsTemplate({
-      tools,
+      tools: inference.tools,
       inferences: session.inferences,
-      input: inferenceRequest.prompt,
+      input: inference.prompt,
     });
-
-    console.log('compiled', compiledPrompt);
-    console.log('ir', inferenceRequest);
 
     return compiledPrompt;
   }
@@ -224,12 +215,19 @@ export class PromptTemplateService {
     authContext: IAuthenticatedContext,
     inferenceRequest: ITestInferenceRequest,
   ) {
+    const tools = await this.toolRepository.find({
+      where: {
+        id: In(inferenceRequest.tools || []),
+        org: { id: authContext.org.id },
+      },
+    });
+
     const templateInstance = new PromptTemplateInstance();
     templateInstance.maxTokens = inferenceRequest.maxTokens;
     templateInstance.stopSequence = inferenceRequest.stopSequence;
     templateInstance.temperature = inferenceRequest.temperature;
     templateInstance.prompt = inferenceRequest.template;
-    templateInstance.tools = []; // TODO
+    templateInstance.tools = tools; // TODO
 
     const session = new Session();
     session.inferences = [];

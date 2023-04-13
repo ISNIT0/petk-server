@@ -12,6 +12,7 @@ import { Profile } from 'src/database/entity/Profile.entity';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { JwtService } from '@nestjs/jwt';
 import { EmailAuthGuard } from 'src/libs/auth/email-auth.guard';
+import { ApiExcludeController } from '@nestjs/swagger';
 
 export class SendAuthEmailDto {
   @IsEmail() email: string;
@@ -21,6 +22,7 @@ export class ValidateAuthCodeDto {
   @IsString() code: string;
 }
 
+@ApiExcludeController()
 @Controller('/auth')
 export class AuthController {
   constructor(

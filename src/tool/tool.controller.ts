@@ -10,7 +10,10 @@ import {
 import { ToolService } from './tool.service';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('tool')
+@ApiBearerAuth()
 @Controller('tool')
 @UseGuards(JwtAuthGuard)
 export class ToolController {

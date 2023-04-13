@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Session } from 'src/database/entity/Session.entity';
 import { OrgModule } from 'src/org/org.module';
@@ -15,7 +15,7 @@ import { InstructionModule } from 'src/instruction/instruction.module';
     OrgModule,
     ProfileModule,
     ApiKeyModule,
-    InferenceModule,
+    forwardRef(() => InferenceModule),
     InstructionModule,
   ],
   providers: [SessionService],

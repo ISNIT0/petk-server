@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { Integration } from './Integration.entity';
 import { Org } from './Org.entity';
+import { SentinelSetting } from './SentinelSetting.entity';
 
 export interface IModelSafetyConfig {
   piiStripping: string[];
@@ -42,6 +43,8 @@ export class Model {
   @ManyToOne(() => Integration)
   @JoinColumn()
   integration: Integration;
+
+  @ManyToOne(() => SentinelSetting) sentinelSetting: SentinelSetting;
 
   isDefault?: boolean;
 }

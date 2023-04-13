@@ -26,7 +26,7 @@ export class SerpapiToolProvider implements IToolProvider<SerpapiToolConfig> {
       response.sports_results?.game_spotlight ||
       response.knowledge_graph?.description ||
       response.organic_results?.snippet ||
-      'No good search result found'
+      'No good search result found, try again with different input'
     );
   }
 }

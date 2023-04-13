@@ -69,14 +69,11 @@ export class ToolService {
     body: { toolType: string; config: any },
   ) {
     let tool: Tool;
-    console.log(toolId, body);
     if (toolId === 'new') {
       const toolIntegration =
         await this.toolIntegrationRepository.findOneOrFail({
           where: { type: body.toolType as any },
         });
-
-      console.log(toolIntegration);
 
       tool = new Tool();
       tool.integration = toolIntegration;

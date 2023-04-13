@@ -8,6 +8,10 @@ import { ProfileModule } from 'src/profile/profile.module';
 import { PromptTemplateModule } from 'src/prompt-template/prompt-template.module';
 import { InferenceService } from './inference.service';
 import { ToolModule } from 'src/tool/tool.module';
+import { Tool } from 'src/database/entity/Tool.entity';
+import { InferenceController } from './inference.controller';
+import { ApiKeyModule } from 'src/api-key/api-key.module';
+import { SessionModule } from 'src/session/session.module';
 
 @Module({
   imports: [
@@ -15,10 +19,13 @@ import { ToolModule } from 'src/tool/tool.module';
     ModelModule,
     ModelProviderModule,
     ProfileModule,
-    TypeOrmModule.forFeature([Session, Inference]),
+    TypeOrmModule.forFeature([Session, Inference, Tool]),
     ToolModule,
+    ApiKeyModule,
+    forwardRef(() => SessionModule),
   ],
   providers: [InferenceService],
   exports: [InferenceService],
+  controllers: [InferenceController],
 })
 export class InferenceModule {}

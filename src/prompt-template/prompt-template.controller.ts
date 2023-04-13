@@ -11,7 +11,10 @@ import { IAuthenticatedContext } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/libs/auth/jwt-auth.guard';
 import { ITestInferenceRequest } from 'src/session/session.service';
 import { PromptTemplateService } from './prompt-template.service';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('prompt-template')
+@ApiBearerAuth()
 @Controller('prompt-template')
 @UseGuards(JwtAuthGuard)
 export class PromptTemplateController {

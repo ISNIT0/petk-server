@@ -85,10 +85,15 @@ export class SessionService {
               promptTemplateInstance: { template: true },
               model: true,
               profile: true,
+              warnings: true,
             }
           : false,
       },
     });
+
+    session.inferences = session.inferences.sort((a, b) =>
+      a.createdAt < b.createdAt ? -1 : 1,
+    );
 
     return session;
   }
