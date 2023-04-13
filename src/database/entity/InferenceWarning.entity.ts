@@ -30,5 +30,6 @@ export class InferenceWarning {
   @Column() type: InferenceWarningType;
   @Column() actionTaken: InferenceWarningAction;
   @Column() detail: string;
+  @Column() source: 'api' | 'playground';
   @Column({ nullable: true }) badString?: string;
 }

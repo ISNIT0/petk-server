@@ -57,7 +57,7 @@ export class InferenceController {
       session = await this.sessionService.createSession(
         authContext,
         sessionType,
-        'playground',
+        'api',
       );
     } else {
       session = await this.sessionService.getSessionById(

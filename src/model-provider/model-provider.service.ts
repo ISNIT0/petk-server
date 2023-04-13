@@ -43,7 +43,7 @@ export class ModelProviderService {
       await this.inferenceSentinelService.checkInferencePrompt(
         authContext,
         inference,
-        session.inferences,
+        session,
       );
 
     if ('block' in sentinelResult) {

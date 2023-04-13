@@ -10,6 +10,7 @@ import { InferenceWarningAction } from 'src/database/entity/InferenceWarning.ent
 import { Model } from 'src/database/entity/Model.entity';
 import { Org } from 'src/database/entity/Org.entity';
 import { SentinelSetting } from 'src/database/entity/SentinelSetting.entity';
+import { Session } from 'src/database/entity/Session.entity';
 import {
   IPIIInstance,
   PIICategory,
@@ -126,7 +127,7 @@ export class InferenceSentinelService {
   async checkInferencePrompt(
     authContext: IAuthenticatedContext,
     prompt: Inference,
-    inferences: Inference[],
+    session: Session,
   ): Promise<
     | {
         sanitizedPrompt: string;
@@ -143,7 +144,7 @@ export class InferenceSentinelService {
     if (!sentinelSetting)
       return {
         sanitizedPrompt: prompt.prompt,
-        sanitizedInferences: inferences,
+        sanitizedInferences: session.inferences,
         substitutions: {},
         results: [],
       };
@@ -152,13 +153,13 @@ export class InferenceSentinelService {
       await this.checkForPII(
         sentinelSetting.promptPiiConfig,
         prompt.prompt,
-        inferences,
+        session.inferences,
       );
 
     const results = piiResults;
     const substitutions = piiSubstitutions;
 
-    this.logInferenceIncidents(authContext, 'prompt', results, prompt);
+    this.logInferenceIncidents(authContext, 'prompt', results, prompt, session);
 
     const blockReason = piiResults.find((result) => result.action === 'block');
 
@@ -170,7 +171,7 @@ export class InferenceSentinelService {
     }
 
     let sanitizedPrompt = prompt.prompt;
-    const sanitizedInferences = inferences.slice();
+    const sanitizedInferences = session.inferences.slice();
 
     for (const [originalString, replaceWith] of Object.entries(substitutions)) {
       sanitizedPrompt = sanitizedPrompt.replaceAll(originalString, replaceWith);
@@ -266,6 +267,7 @@ export class InferenceSentinelService {
     warningOn: 'prompt' | 'response',
     sentinelResults: ISentinelResult[],
     inference: Inference,
+    session: Session,
   ) {
     const inferenceWarnings = sentinelResults.map((result) => {
       const inferenceWarning = new InferenceWarning();
@@ -276,6 +278,7 @@ export class InferenceSentinelService {
       inferenceWarning.warningOn = warningOn;
       inferenceWarning.inference = inference;
       inferenceWarning.model = inference.model;
+      inferenceWarning.source = session.source;
       inferenceWarning.org = { id: authContext.org.id } as Org;
       return inferenceWarning;
     });
