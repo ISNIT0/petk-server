@@ -9,6 +9,8 @@ import {
   chatPrompt,
   instructionPrompt,
   pirateChatPrompt,
+  taskCreationPrompt,
+  taskExecutionPrompt,
 } from 'src/fixtures/prompts';
 import { Repository } from 'typeorm';
 
@@ -101,6 +103,50 @@ export class OrgService {
     instructionPromptTemplateInstance =
       await this.promptTemplateInstanceRepository.save(
         instructionPromptTemplateInstance,
+      );
+
+    let taskExecutionPromptTemplate = new PromptTemplate();
+    taskExecutionPromptTemplate.name = 'Task Execution';
+    taskExecutionPromptTemplate.org = org;
+    taskExecutionPromptTemplate.promptType = 'instruction';
+    taskExecutionPromptTemplate.description = 'A Task Execution Prompt';
+    taskExecutionPromptTemplate = await this.promptTemplateRepository.save(
+      taskExecutionPromptTemplate,
+    );
+
+    let taskExecutionPromptTemplateInstance = new PromptTemplateInstance();
+    taskExecutionPromptTemplateInstance.org = org;
+    taskExecutionPromptTemplateInstance.maxTokens = 1000;
+    // taskExecutionPromptTemplateInstance.stopSequence = 'Observation:';
+    taskExecutionPromptTemplateInstance.temperature = 0;
+    taskExecutionPromptTemplateInstance.description = 'A Task Execution Prompt';
+    taskExecutionPromptTemplateInstance.prompt = taskExecutionPrompt;
+    taskExecutionPromptTemplateInstance.template = taskExecutionPromptTemplate;
+    taskExecutionPromptTemplateInstance =
+      await this.promptTemplateInstanceRepository.save(
+        taskExecutionPromptTemplateInstance,
+      );
+
+    let taskCreationPromptTemplate = new PromptTemplate();
+    taskCreationPromptTemplate.name = 'Task Execution';
+    taskCreationPromptTemplate.org = org;
+    taskCreationPromptTemplate.promptType = 'instruction';
+    taskCreationPromptTemplate.description = 'A Task Execution Prompt';
+    taskCreationPromptTemplate = await this.promptTemplateRepository.save(
+      taskCreationPromptTemplate,
+    );
+
+    let taskCreationPromptTemplateInstance = new PromptTemplateInstance();
+    taskCreationPromptTemplateInstance.org = org;
+    taskCreationPromptTemplateInstance.maxTokens = 1000;
+    // taskCreationPromptTemplateInstance.stopSequence = 'Observation:';
+    taskCreationPromptTemplateInstance.temperature = 0;
+    taskCreationPromptTemplateInstance.description = 'A Task Execution Prompt';
+    taskCreationPromptTemplateInstance.prompt = taskCreationPrompt;
+    taskCreationPromptTemplateInstance.template = taskCreationPromptTemplate;
+    taskCreationPromptTemplateInstance =
+      await this.promptTemplateInstanceRepository.save(
+        taskCreationPromptTemplateInstance,
       );
     return org;
   }
