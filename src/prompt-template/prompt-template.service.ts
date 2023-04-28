@@ -179,11 +179,11 @@ export class PromptTemplateService {
 
   async compilePromptTemplateInstance(
     authContext: IAuthenticatedContext,
-    instance: PromptTemplateInstance,
+    instance: PromptTemplateInstance | undefined,
     session: Session,
     inference: Inference,
   ) {
-    const hbsTemplate = Handlebars.compile(instance.prompt);
+    const hbsTemplate = Handlebars.compile(instance?.prompt || '{{input}}');
     const compiledPrompt = hbsTemplate({
       tools: inference.tools,
       inferences: session.inferences,
