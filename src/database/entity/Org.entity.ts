@@ -26,6 +26,9 @@ export class Org {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  emailDomain?: string;
+
   @ManyToMany(() => Profile, (profile) => profile.orgs)
   @JoinTable()
   orgUsers: Profile[];

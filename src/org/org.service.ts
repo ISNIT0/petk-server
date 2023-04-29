@@ -25,6 +25,10 @@ export class OrgService {
     private promptTemplateInstanceRepository: Repository<PromptTemplateInstance>,
   ) {}
 
+  async getOrgByEmailDomain(domain: string) {
+    return this.orgRepository.findOne({ where: { emailDomain: domain } });
+  }
+
   async getByAuthContext(authContext: IAuthenticatedContext) {
     const org = await this.orgRepository.findOneOrFail({
       where: { id: authContext.org.id },

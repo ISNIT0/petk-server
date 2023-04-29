@@ -37,6 +37,12 @@ export class AuthService {
       profile.name = '';
       profile.avatarUrl = '';
       profile.email = email;
+      const domain = email.split('@')[1];
+      const orgForDomain = await this.orgService.getOrgByEmailDomain(domain);
+      if (orgForDomain) {
+        profile.orgs = [orgForDomain];
+      }
+
       profile = await this.profileRepository.save(profile);
       // throw new Error(`User doesn't exist`);
     }
