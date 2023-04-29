@@ -36,7 +36,7 @@ export class Model {
   @Column({ nullable: true })
   description: string;
 
-  @Column() provider: 'http' | 'OpenAI';
+  @Column() provider: 'http' | 'OpenAI' | 'Conjecture';
   @Column('simple-json', { default: {} }) config: Record<string, any>;
   @Column('simple-json', { default: {} }) safetyConfig: IModelSafetyConfig;
 

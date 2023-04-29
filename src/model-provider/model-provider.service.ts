@@ -6,6 +6,7 @@ import { Session } from 'src/database/entity/Session.entity';
 import { IInferenceRequest } from 'src/session/session.service';
 import { IModelInferenceResult, IModelProvider } from './IModelProvider';
 import { OpenAIProvider } from './providers/OpenAI.provider';
+import { ConjectureProvider } from './providers/Conjecture.provider';
 import {
   ISentinelResult,
   InferenceSentinelService,
@@ -23,9 +24,11 @@ export class ModelProviderService {
   constructor(
     private inferenceSentinelService: InferenceSentinelService,
     private openAIProvider: OpenAIProvider,
+    private conjectureProvider: ConjectureProvider,
   ) {
     this.providers = {
       OpenAI: openAIProvider,
+      Conjecture: conjectureProvider,
     };
   }
 

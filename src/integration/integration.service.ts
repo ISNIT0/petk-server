@@ -7,6 +7,7 @@ import { Org } from 'src/database/entity/Org.entity';
 import { Repository } from 'typeorm';
 import { IIntegrationDefinition } from './integrationDefinitions/IIntegrationDefinition';
 import { OpenAIDefinition } from './integrationDefinitions/OpenAIDefinition';
+import { ConjectureDefinition } from './integrationDefinitions/ConjectureDefinition';
 
 @Injectable()
 export class IntegrationService {
@@ -19,9 +20,11 @@ export class IntegrationService {
     private integrationRepository: Repository<Integration>,
 
     private openAIDefinition: OpenAIDefinition,
+    private conjectureDefinition: ConjectureDefinition,
   ) {
     this.definitions = {
       OpenAI: this.openAIDefinition,
+      Conjecture: this.conjectureDefinition,
     };
   }
 
