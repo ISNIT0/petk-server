@@ -12,6 +12,7 @@ import { Tool } from 'src/database/entity/Tool.entity';
 import { InferenceController } from './inference.controller';
 import { ApiKeyModule } from 'src/api-key/api-key.module';
 import { SessionModule } from 'src/session/session.module';
+import { InferenceRatingModule } from 'src/inference-rating/inference-rating.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { SessionModule } from 'src/session/session.module';
     ToolModule,
     ApiKeyModule,
     forwardRef(() => SessionModule),
+    InferenceRatingModule,
   ],
   providers: [InferenceService],
   exports: [InferenceService],

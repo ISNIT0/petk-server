@@ -21,5 +21,6 @@ export class InferenceRating {
 
   @ManyToOne(() => Inference) inference: Inference;
   @Column() rating: number; // -1 - 1
-  @ManyToOne(() => Profile) profile?: Profile;
+  @Column('simple-json', { nullable: true }) context?: Record<string, unknown>;
+  @ManyToOne(() => Profile) profile: Profile;
 }

@@ -86,6 +86,7 @@ export class SessionService {
               model: true,
               profile: true,
               warnings: true,
+              ratings: true,
             }
           : false,
       },

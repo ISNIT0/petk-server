@@ -37,7 +37,10 @@ export class Model {
   description: string;
 
   @Column() provider: 'http' | 'OpenAI' | 'Conjecture';
-  @Column('simple-json', { default: {} }) config: Record<string, any>;
+  @Column('simple-json', { default: {}, select: false }) config: Record<
+    string,
+    any
+  >;
   @Column('simple-json', { default: {} }) safetyConfig: IModelSafetyConfig;
 
   @ManyToOne(() => Integration)

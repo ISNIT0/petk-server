@@ -17,6 +17,7 @@ import { Session } from './Session.entity';
 import { ToolIntegration } from './ToolIntegration.entity';
 import { Tool } from './Tool.entity';
 import { InferenceWarning } from './InferenceWarning.entity';
+import { InferenceRating } from './InferenceRating.entity';
 
 @Entity()
 export class Inference {
@@ -36,6 +37,8 @@ export class Inference {
   @ManyToOne(() => Inference) previousInference: Inference;
   @OneToMany(() => InferenceWarning, (warning) => warning.inference)
   warnings: InferenceWarning[];
+  @OneToMany(() => InferenceRating, (rating) => rating.inference)
+  ratings: InferenceRating[];
 
   @Column() prompt: string;
   @Column({ nullable: true }) response?: string;

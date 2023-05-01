@@ -19,6 +19,7 @@ import { IntegrationModule } from './integration/integration.module';
 import { ToolModule } from './tool/tool.module';
 import { InferenceSentinelModule } from './inference-sentinel/inference-sentinel.module';
 import { PiiDetectorModule } from './pii-detector/pii-detector.module';
+import { InferenceRatingModule } from './inference-rating/inference-rating.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { PiiDetectorModule } from './pii-detector/pii-detector.module';
     ToolModule,
     InferenceSentinelModule,
     PiiDetectorModule,
+    InferenceRatingModule,
   ],
   controllers: [],
   providers: [],

@@ -49,6 +49,9 @@ export class ModelService {
         org: { id: authContext.org.id },
         id: modelId,
       },
+      select: this.modelRepository.metadata.columns.map(
+        (c) => c.propertyName,
+      ) as any[],
     });
 
     const isDefault =
