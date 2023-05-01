@@ -58,4 +58,13 @@ export class InferenceRatingService {
       },
     });
   }
+
+  async getAll(authContext: IAuthenticatedContext) {
+    return this.inferenceRatingRepo.find({
+      where: { inference: { session: { org: { id: authContext.org.id } } } },
+      relations: {
+        inference: { session: true },
+      },
+    });
+  }
 }
