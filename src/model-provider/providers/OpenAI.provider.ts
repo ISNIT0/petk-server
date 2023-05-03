@@ -48,11 +48,12 @@ export class OpenAIProvider extends IModelProvider<
       // TODO: smarter prompt parsing so you can pre and post prompt around inputs
       // This assumes history and input go after the rest of the system prompt
       const systemMsg =
-        inference.promptTemplateInstance?.prompt
-          .replace('{tools}', '')
-          .replace('{tool_names}', '')
-          .replace('{history}', '')
-          .replace('{input}', '') || '';
+        await this.promptTemplateService.compilePromptTemplateInstance(
+          authContext,
+          inference.promptTemplateInstance,
+          session,
+          inference,
+        );
       const messages: ChatCompletionRequestMessage[] = [
         ...(systemMsg
           ? [
@@ -94,6 +95,7 @@ export class OpenAIProvider extends IModelProvider<
     const openai = new OpenAIApi(configuration);
 
     if (config.modelId.startsWith('text-davinci-0')) {
+      console.log('Raw Prompt', prompt);
       const response = await openai.createCompletion({
         model: config.modelId,
         prompt,
