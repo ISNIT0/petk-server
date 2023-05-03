@@ -6,8 +6,6 @@ import {
   OpenAIApi,
 } from 'openai';
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
-import { IInferenceRequest } from 'src/session/session.service';
-import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstance.entity';
 import { Session } from 'src/database/entity/Session.entity';
 import { PromptTemplateService } from 'src/prompt-template/prompt-template.service';
 import { IAuthenticatedContext } from 'src/auth/auth.service';
@@ -44,13 +42,21 @@ export class OpenAIProvider extends IModelProvider<
         inference,
       );
     } else {
+      console.log('Inference Object:', inference);
+
       // TODO: TOOLS
       // TODO: smarter prompt parsing so you can pre and post prompt around inputs
       // This assumes history and input go after the rest of the system prompt
       const systemMsg =
         await this.promptTemplateService.compilePromptTemplateInstance(
           authContext,
-          inference.promptTemplateInstance,
+          {
+            ...inference.promptTemplateInstance,
+            prompt: inference.promptTemplateInstance.prompt.replace(
+              '{{input}}',
+              'the next message',
+            ),
+          },
           session,
           inference,
         );
