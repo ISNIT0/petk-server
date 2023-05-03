@@ -7,10 +7,7 @@ import { PromptTemplateInstance } from 'src/database/entity/PromptTemplateInstan
 import { Session } from 'src/database/entity/Session.entity';
 import { Tool } from 'src/database/entity/Tool.entity';
 import { InferenceService } from 'src/inference/inference.service';
-import {
-  IInferenceRequest,
-  ITestInferenceRequest,
-} from 'src/session/session.service';
+import { ITestInferenceRequest } from 'src/session/session.service';
 import { In, Repository } from 'typeorm';
 import Handlebars from 'handlebars';
 import { Inference } from 'src/database/entity/Inference.entity';
@@ -25,7 +22,7 @@ export class PromptTemplateService {
     @InjectRepository(Org)
     private orgRepository: Repository<Org>,
     @InjectRepository(Tool)
-    private toolRepository: Repository<Tool>,
+    private toolRepository: Repository<Tool<any>>,
     @Inject(forwardRef(() => InferenceService))
     private inferenceService: InferenceService,
   ) {}
@@ -188,6 +185,7 @@ export class PromptTemplateService {
       tools: inference.tools,
       inferences: session.inferences,
       input: inference.prompt,
+      data: inference.promptMergeData || {},
     });
 
     return compiledPrompt;
