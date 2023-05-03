@@ -52,7 +52,7 @@ export class OpenAIProvider extends IModelProvider<
           authContext,
           {
             ...inference.promptTemplateInstance,
-            prompt: inference.promptTemplateInstance.prompt.replace(
+            prompt: inference.promptTemplateInstance?.prompt.replace(
               '{{input}}',
               'the next message',
             ),
