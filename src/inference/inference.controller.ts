@@ -43,7 +43,7 @@ export class RawInferenceDTO {
   @ApiProperty() temperature: number;
   @ApiProperty() stopSequence?: string;
   @ApiPropertyOptional() templateId?: string;
-  @ApiPropertyOptional() templateMergeData?: Record<string, any>;
+  @ApiPropertyOptional() promptMergeData?: Record<string, any>;
 }
 
 @Controller('/inference')

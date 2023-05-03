@@ -26,7 +26,7 @@ export class InferenceService {
     @InjectRepository(Inference)
     private inferenceRepository: Repository<Inference>,
     @InjectRepository(Tool)
-    private toolRepository: Repository<Tool>,
+    private toolRepository: Repository<Tool<any>>,
     private modelProvider: ModelProviderService,
     private profileService: ProfileService,
   ) {}
@@ -79,6 +79,7 @@ export class InferenceService {
     inference.promptTemplateInstance = templateInstance;
     inference.session = session;
     inference.type = inferenceRequest.type;
+    inference.promptMergeData = inferenceRequest.promptMergeData;
 
     const ret = await this.modelProvider.infer(authContext, inference, session);
 
@@ -116,6 +117,7 @@ export class InferenceService {
     inference.session = session;
     inference.type = inferenceRequest.type;
     inference.toolProfile = inferenceRequest.toolProfile;
+    inference.promptMergeData = inferenceRequest.promptMergeData;
     inference = await this.inferenceRepository.save(inference);
 
     const { response, promptSentinelResults, responseSentinelResults } =
@@ -129,6 +131,48 @@ export class InferenceService {
     });
 
     return { inference, promptSentinelResults, responseSentinelResults };
+  }
+
+  async createChunkedInferences(
+    authContext: IAuthenticatedContext,
+    inferenceRequest: IInferenceRequest,
+    session: Session,
+    chunks: string[],
+  ) {
+    const [profile] = await Promise.all([
+      this.profileService.getByAuthContext(authContext),
+    ]);
+    const { model, promptTemplate } = await this.getInferenceParameters(
+      authContext,
+      inferenceRequest,
+    );
+    const tools = await this.toolRepository.find({
+      where: {
+        id: In(inferenceRequest.tools || []),
+        org: { id: authContext.org.id },
+      },
+    });
+
+    const chunkedInferences = await Promise.all(
+      chunks.map((chunk) => {
+        const inference = new Inference();
+        inference.prompt = chunk;
+        inference.response = '';
+
+        inference.model = model;
+        inference.tools = tools;
+        // inference.previousInference; // TODO
+        inference.profile = profile;
+        inference.promptTemplateInstance = promptTemplate;
+        inference.session = session;
+        inference.type = inferenceRequest.type;
+        inference.toolProfile = inferenceRequest.toolProfile;
+        inference.promptMergeData = inferenceRequest.promptMergeData;
+        return this.inferenceRepository.save(inference);
+      }),
+    );
+
+    return chunkedInferences;
   }
 
   async rawInfer(
@@ -156,7 +200,7 @@ export class InferenceService {
     inference.model = model;
     inference.tools = [];
     inference.promptTemplateInstance = template;
-    inference.promptMergeData = inferenceRequest.templateMergeData;
+    inference.promptMergeData = inferenceRequest.promptMergeData;
     // inference.previousInference; // TODO
     inference.profile = profile;
     inference.prompt = inferenceRequest.prompt;
@@ -204,6 +248,7 @@ export class InferenceService {
     inference.session = session;
     inference.type = inferenceRequest.type;
     inference.toolProfile = inferenceRequest.toolProfile;
+    inference.promptMergeData = inferenceRequest.promptMergeData;
 
     const inferences = await this.getInferencesForSession(authContext, session);
     session.inferences = inferences;

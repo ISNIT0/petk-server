@@ -18,6 +18,7 @@ export interface IInferenceRequest {
     avatarUrl: string;
     provider: ToolIntegration['type'];
   };
+  promptMergeData?: Record<string, any>;
 }
 
 export type ITestInferenceRequest = IInferenceRequest & {
