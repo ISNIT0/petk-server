@@ -99,11 +99,15 @@ export class ModelProviderService {
         0,
     };
 
+    console.log(`Raw Inference Prompt: ${prompt}`);
+
     const inferenceResult = await provider.infer(
       inference.model.config,
       prompt,
       inferenceSettings,
     );
+
+    console.log(`Raw Inference Response: ${inferenceResult.response}`);
 
     const sanitizedInferenceResult =
       await this.inferenceSentinelService.checkInferenceResult(
