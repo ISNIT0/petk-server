@@ -11,7 +11,7 @@ import { Org } from './Org.entity';
 import { ToolIntegration } from './ToolIntegration.entity';
 
 @Entity()
-export class Tool {
+export class Tool<TToolConfig extends Record<string, any>> {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 

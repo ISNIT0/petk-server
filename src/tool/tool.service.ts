@@ -11,7 +11,7 @@ import { Org } from 'src/database/entity/Org.entity';
 export class ToolService {
   constructor(
     @InjectRepository(Tool)
-    private toolRepository: Repository<Tool>,
+    private toolRepository: Repository<Tool<any>>,
     @InjectRepository(ToolIntegration)
     private toolIntegrationRepository: Repository<ToolIntegration>,
     private toolProviderService: ToolProviderService,
@@ -68,7 +68,7 @@ export class ToolService {
     toolId: string,
     body: { toolType: string; config: any },
   ) {
-    let tool: Tool;
+    let tool: Tool<any>;
     if (toolId === 'new') {
       const toolIntegration =
         await this.toolIntegrationRepository.findOneOrFail({

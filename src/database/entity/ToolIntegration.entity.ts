@@ -18,7 +18,7 @@ export class ToolIntegration {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(() => Tool, (tool) => tool.integration) tools: Tool[];
+  @OneToMany(() => Tool, (tool) => tool.integration) tools: Tool<any>[];
 
   @Column() iconUrl: string;
 

@@ -49,7 +49,7 @@ export class Inference {
 
   @JoinTable()
   @ManyToMany(() => Tool)
-  tools: Tool[];
+  tools: Tool<any>[];
 
   @Column('simple-json', { nullable: true }) toolProfile?: {
     name: string;

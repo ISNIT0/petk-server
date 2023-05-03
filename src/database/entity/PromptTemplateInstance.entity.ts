@@ -45,5 +45,5 @@ export class PromptTemplateInstance {
 
   @JoinTable()
   @ManyToMany(() => Tool)
-  tools: Tool[];
+  tools: Tool<any>[];
 }
