@@ -99,7 +99,7 @@ export class ModelProviderService {
         0,
     };
 
-    console.log(`Raw Inference Prompt: ${prompt}`);
+    console.log(`Raw Inference Prompt: ${JSON.stringify(prompt, null, '\t')}`);
 
     const inferenceResult = await provider.infer(
       inference.model.config,
