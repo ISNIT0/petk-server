@@ -18,6 +18,7 @@ export interface IInferenceRequest {
     avatarUrl: string;
     provider: ToolIntegration['type'];
   };
+  maxTokens?: number;
   promptMergeData?: Record<string, any>;
 }
 

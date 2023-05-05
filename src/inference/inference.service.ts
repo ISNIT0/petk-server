@@ -78,6 +78,7 @@ export class InferenceService {
     inference.prompt = inferenceRequest.prompt;
     inference.promptTemplateInstance = templateInstance;
     inference.session = session;
+    inference.maxTokensOverride = inferenceRequest.maxTokens;
     inference.type = inferenceRequest.type;
     inference.promptMergeData = inferenceRequest.promptMergeData;
 
@@ -115,6 +116,7 @@ export class InferenceService {
     inference.prompt = inferenceRequest.prompt;
     inference.promptTemplateInstance = promptTemplate;
     inference.session = session;
+    inference.maxTokensOverride = inferenceRequest.maxTokens;
     inference.type = inferenceRequest.type;
     inference.toolProfile = inferenceRequest.toolProfile;
     inference.promptMergeData = inferenceRequest.promptMergeData;
@@ -166,6 +168,7 @@ export class InferenceService {
         inference.promptTemplateInstance = promptTemplate;
         inference.session = session;
         inference.type = inferenceRequest.type;
+        inference.maxTokensOverride = inferenceRequest.maxTokens;
         inference.toolProfile = inferenceRequest.toolProfile;
         inference.promptMergeData = inferenceRequest.promptMergeData;
         return this.inferenceRepository.save(inference);
@@ -204,6 +207,7 @@ export class InferenceService {
     // inference.previousInference; // TODO
     inference.profile = profile;
     inference.prompt = inferenceRequest.prompt;
+    inference.maxTokensOverride = inferenceRequest.maxTokens;
     inference.session = session;
     inference.type = 'api';
     inference = await this.inferenceRepository.save(inference);
@@ -247,6 +251,7 @@ export class InferenceService {
     inference.promptTemplateInstance = promptTemplate;
     inference.session = session;
     inference.type = inferenceRequest.type;
+    inference.maxTokensOverride = inferenceRequest.maxTokens;
     inference.toolProfile = inferenceRequest.toolProfile;
     inference.promptMergeData = inferenceRequest.promptMergeData;
 
